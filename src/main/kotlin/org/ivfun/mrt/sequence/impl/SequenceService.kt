@@ -22,19 +22,15 @@ class SequenceService(val repository: SequenceRepository)
         var contains: Boolean = false
         var field: KProperty1<Any, *>? = null
 
-        any.javaClass
-                .kotlin
-                .memberProperties
-                .forEach { memberProperty ->
-                    if (memberProperty.javaField!!.isAnnotationPresent(AutoIncrement::class.java))
-                    {
-                        sequence = memberProperty.javaField!!.getDeclaredAnnotation(AutoIncrement::class.java).sequence
-                        increment = memberProperty.javaField!!.getDeclaredAnnotation(AutoIncrement::class.java).increment
-                        contains = true
-                        field = memberProperty
-
-                    }
-                }
+        any.javaClass.kotlin.memberProperties.forEach { memberProperty ->
+            if (memberProperty.javaField!!.isAnnotationPresent(AutoIncrement::class.java))
+            {
+                sequence = memberProperty.javaField!!.getDeclaredAnnotation(AutoIncrement::class.java).sequence
+                increment = memberProperty.javaField!!.getDeclaredAnnotation(AutoIncrement::class.java).increment
+                contains = true
+                field = memberProperty
+            }
+        }
         return SequenceHelper(sequence, increment, contains, field)
     }
 
@@ -43,7 +39,6 @@ class SequenceService(val repository: SequenceRepository)
         val next: Long = next(helper.sequence!!, helper.increment!!)
         helper.field!!.javaField!!.isAccessible = true
         helper.field.javaField!!.set(any, next)
-
     }
 
     fun next(name: String, increment: Int): Long
@@ -67,4 +62,3 @@ class SequenceService(val repository: SequenceRepository)
         }
     }
 }
-
